@@ -1,5 +1,5 @@
 "use server";
-import { string, z } from "zod";
+import { z } from "zod";
 import postgres from "postgres";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -55,6 +55,7 @@ export async function createInvoice(prevState: State, formData: FormData) {
     Values(${customerId}, ${amountInCents}, ${status}, ${date})
     `;
   } catch (error) {
+    console.log(error);
     return {
       message: "Database Error: Failed to Create Invoice.",
     };

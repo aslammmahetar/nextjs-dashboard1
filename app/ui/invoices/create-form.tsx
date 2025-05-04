@@ -44,8 +44,10 @@ export default function Form({ customers }: { customers: CustomerField[] }) {
           </div>
           <div id="customer-error" aria-live="polite" aria-atomic="true">
             {state.errors?.customerId &&
-              state.errors.customerId.map((error: string) => (
-                <p className="mt-2 text-sm text-red-500">{error}</p>
+              state.errors.customerId.map((error: string, index: number) => (
+                <p className="mt-2 text-sm text-red-500" key={index}>
+                  {error}
+                </p>
               ))}
           </div>
         </div>
@@ -70,8 +72,10 @@ export default function Form({ customers }: { customers: CustomerField[] }) {
             </div>
             <div id="amount-error" aria-live="polite" aria-atomic="true">
               {state.errors?.amount &&
-                state.errors.amount.map((error: string) => (
-                  <p className="mt-2 text-sm text-red-500">{error}</p>
+                state.errors.amount.map((error: string, index: number) => (
+                  <p className="mt-2 text-sm text-red-500" key={index}>
+                    {error}
+                  </p>
                 ))}
             </div>
           </div>
@@ -119,8 +123,10 @@ export default function Form({ customers }: { customers: CustomerField[] }) {
           </div>
           <div id="status-error" aria-live="polite" aria-atomic="true">
             {state.errors?.status &&
-              state.errors.status.map((error: string) => (
-                <p className="mt-2 text-sm text-red-500">{error}</p>
+              state.errors.status.map((error: string, index: number) => (
+                <p className="mt-2 text-sm text-red-500" key={index}>
+                  {error}
+                </p>
               ))}
           </div>
         </fieldset>
