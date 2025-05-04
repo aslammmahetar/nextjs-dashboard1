@@ -113,6 +113,8 @@ export async function authenticate(
 ) {
   try {
     await signIn("credentials", formData);
+    console.log("I am here!");
+    redirect("/dashboard");
   } catch (error) {
     if (error && typeof error === "object" && "message" in error) {
       return error.message === "CredentialsSignin"
