@@ -108,19 +108,31 @@ export async function deleteInvoice(id: string) {
 }
 
 export async function authenticate(
-  preveState: string | undefined,
+  prevState: string | undefined,
   formData: FormData
 ) {
   try {
-    await signIn("credentials", formData);
-    console.log("I am here!");
-    redirect("/dashboard");
-  } catch (error) {
-    if (error && typeof error === "object" && "message" in error) {
-      return error.message === "CredentialsSignin"
-        ? "Invalid Credentials"
-        : "Something went wrong!";
+    const result = await signIn("credentials", {
+      redirect: false,
+      email: formData.get("email"),
+      password: formData.get("password"),
+      callbackUrl: formData.get("redirectTo")?.toString(),
+    });
+
+    if (result?.error) {
+      return "Invalid Credentials";
     }
-    throw error;
+
+    if (result?.url) {
+      redirect(result.url); // or use router.push if you prefer
+    }
+
+    return undefined;
+  } catch (error) {
+    console.error("Authentication error:", error);
+    if (error instanceof Error) {
+      return error.message;
+    }
+    return "Something went wrong!";
   }
 }
