@@ -4,6 +4,7 @@ import postgres from "postgres";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { signIn } from "@/auth";
+import { AuthError } from "next-auth";
 
 const FormSchema = z.object({
   id: z.string(),
@@ -112,27 +113,21 @@ export async function authenticate(
   formData: FormData
 ) {
   try {
-    const result = await signIn("credentials", {
-      redirect: false,
-      email: formData.get("email"),
-      password: formData.get("password"),
-      callbackUrl: formData.get("redirectTo")?.toString(),
-    });
-
-    if (result?.error) {
-      return "Invalid Credentials";
-    }
-
-    if (result?.url) {
-      redirect(result.url); // or use router.push if you prefer
-    }
-
-    return undefined;
+    await signIn("credentials", formData);
   } catch (error) {
-    console.error("Authentication error:", error);
-    if (error instanceof Error) {
-      return error.message;
+    console.log(error);
+    if (error instanceof AuthError) {
+      console.log(error);
+      const authError = error as unknown as { type?: string };
+      switch (authError?.type) {
+        case "CredentialsSignin":
+          console.log(error);
+          return "Invalid credentials.";
+        default:
+          console.log(error.message);
+          return "Something went wrong.";
+      }
     }
-    return "Something went wrong!";
+    throw error;
   }
 }

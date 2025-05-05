@@ -3,8 +3,8 @@ import { authConfig } from "./auth.config";
 import Credentials from "next-auth/providers/credentials";
 import { z } from "zod";
 import type { User } from "@/app/lib/definitions";
-import postgres from "postgres";
 import bcrypt from "bcryptjs";
+import postgres from "postgres";
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
 
@@ -22,35 +22,19 @@ export const { auth, signIn, signOut } = NextAuth({
   ...authConfig,
   providers: [
     Credentials({
-      name: "Credentials",
-      credentials: {
-        email: { label: "Email", type: "email" },
-        password: { label: "Password", type: "password" },
-      },
       async authorize(credentials) {
-        try {
-          const parsedCredentials = z
-            .object({
-              email: z.string().email(),
-              password: z.string().min(6),
-            })
-            .safeParse(credentials);
-
-          if (!parsedCredentials.success) {
-            return null;
-          }
-
+        const parsedCredentials = z
+          .object({ email: z.string().email(), password: z.string().min(6) })
+          .safeParse(credentials);
+        if (parsedCredentials.success) {
           const { email, password } = parsedCredentials.data;
           const user = await getUser(email);
-
           if (!user) return null;
-
           const passwordsMatch = await bcrypt.compare(password, user.password);
-          return passwordsMatch ? user : null;
-        } catch (error) {
-          console.error("Authorization error:", error);
-          return null;
+          if (passwordsMatch) return user;
         }
+        console.log("Invalid credentials");
+        return null;
       },
     }),
   ],
